@@ -110,36 +110,43 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="chat-container">
-      <aside className="sidebar">
-        <div className="sidebar-top">
-          <button
-            className="new-chat"
-            onClick={() => {
-              setMessages([]);
-              setError(null);
-              setInput("");
-            }}
-            disabled={isLoading}
-          >
-            + New chat
-          </button>
-        </div>
+    <div className="flex h-screen bg-slate-950">
+      {/* Left Sidebar */}
+      <aside className="w-64 bg-slate-900 border-r border-slate-800 p-4 flex flex-col gap-4">
+        <button
+          onClick={() => {
+            setMessages([]);
+            setError(null);
+            setInput("");
+          }}
+          disabled={isLoading}
+          className="w-full bg-slate-800 hover:bg-slate-700 text-white p-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          + New chat
+        </button>
 
-        <div className="sidebar-section">
-          <h4>Personas</h4>
-          <div className="persona-list">
+        <div>
+          <h4 className="text-slate-400 text-sm font-medium mb-2">Personas</h4>
+          <div className="flex flex-col gap-2">
             <button
-              className={`persona-item ${persona === "piyush" ? "active" : ""}`}
               onClick={() => handlePersonaChange("piyush")}
               disabled={isLoading}
+              className={`text-left p-2 rounded-lg border transition-colors ${
+                persona === "piyush"
+                  ? "bg-slate-800 border-slate-700"
+                  : "border-slate-800 hover:bg-slate-800/50"
+              } disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               {getPersonaName("piyush")}
             </button>
             <button
-              className={`persona-item ${persona === "hitesh" ? "active" : ""}`}
               onClick={() => handlePersonaChange("hitesh")}
               disabled={isLoading}
+              className={`text-left p-2 rounded-lg border transition-colors ${
+                persona === "hitesh"
+                  ? "bg-slate-800 border-slate-700"
+                  : "border-slate-800 hover:bg-slate-800/50"
+              } disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               {getPersonaName("hitesh")}
             </button>
@@ -147,76 +154,93 @@ export default function ChatPage() {
         </div>
       </aside>
 
-      <main className="chat-main">
-        <div className="chat-header">
-          <h1>Persona</h1>
-          <div className="header-actions">
-            <div className="persona-chip">{getPersonaName(persona)}</div>
+      {/* Main Chat Area */}
+      <main className="flex-1 flex flex-col min-w-0">
+        {/* Header */}
+        <div className="h-16 border-b border-slate-800 bg-slate-900 flex items-center justify-between px-6">
+          <h1 className="text-xl font-semibold text-white">Persona</h1>
+          <div className="bg-blue-600/20 text-blue-400 px-3 py-1 rounded-full text-sm font-medium">
+            {getPersonaName(persona)}
           </div>
         </div>
 
         {/* Messages Area */}
-        <div className="chat-messages">
-        {messages.length === 0 && !isLoading && (
-          <div className="empty-state">
-            <div>
-              <p>👋 Welcome to AI Chat!</p>
-              <p style={{ fontSize: "0.9rem", marginTop: "8px", color: "#bbb" }}>
-                Ask me anything about coding...
-              </p>
-            </div>
-          </div>
-        )}
-
-        {messages.map((msg) => (
-          <div key={msg.id} className={`message ${msg.role}`}>
-            <div className="message-content">{msg.content}</div>
-          </div>
-        ))}
-
-        {isLoading && (
-          <div className="message loading">
-            <div className="message-content">
-              <div className="loading-dots">
-                <span></span>
-                <span></span>
-                <span></span>
+        <div className="flex-1 overflow-y-auto p-6">
+          {messages.length === 0 && !isLoading && (
+            <div className="flex items-center justify-center h-full text-slate-400 text-center">
+              <div>
+                <p className="text-xl"></p>
+                <p className="text-sm mt-2 text-slate-500">
+                  Ask me anything about coding...
+                </p>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {error && (
-          <div className="error-message">
-            <strong>Error:</strong> {error}
-          </div>
-        )}
+          <div className="flex flex-col gap-4">
+            {messages.map((msg) => (
+              <div
+                key={msg.id}
+                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+              >
+                <div
+                  className={`max-w-[70%] p-4 rounded-xl ${
+                    msg.role === "user"
+                      ? "bg-blue-600 text-white rounded-br-sm"
+                      : "bg-slate-800 text-slate-100 rounded-bl-sm"
+                  }`}
+                  style={{ animation: "slideIn 0.3s ease-out" }}
+                >
+                  {msg.content}
+                </div>
+              </div>
+            ))}
 
-        <div ref={messagesEndRef} />
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="bg-slate-800 text-slate-400 p-4 rounded-xl rounded-bl-sm italic">
+                  <div className="flex gap-1">
+                    <span className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: "0s" }}></span>
+                    <span className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></span>
+                    <span className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {error && (
+              <div className="bg-red-900/50 text-red-300 p-4 rounded-xl border-l-4 border-red-500">
+                <strong>Error:</strong> {error}
+              </div>
+            )}
+          </div>
+
+          <div ref={messagesEndRef} />
         </div>
 
         {/* Input Area */}
-        <div className="chat-input-area">
-        <textarea
-          ref={inputRef}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyPress={handleKeyPress}
-          placeholder="Type your message... (Shift+Enter for new line)"
-          className="chat-input"
-          disabled={isLoading}
-          rows={1}
-        />
-        <button
-          onClick={handleSend}
-          disabled={!input.trim() || isLoading}
-          className="send-button"
-        >
-          {isLoading ? "..." : "Send"}
-        </button>
+        <div className="border-t border-slate-800 bg-slate-900 p-4">
+          <div className="flex gap-3">
+            <textarea
+              ref={inputRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Type your message... (Shift+Enter for new line)"
+              className="flex-1 p-4 rounded-xl border border-slate-700 bg-slate-800 text-white placeholder-slate-400 resize-none max-h-[100px] transition-all focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+              disabled={isLoading}
+              rows={1}
+            />
+            <button
+              onClick={handleSend}
+              disabled={!input.trim() || isLoading}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-w-[100px]"
+            >
+              {isLoading ? "..." : "Send"}
+            </button>
+          </div>
         </div>
-
-        </main>
-      </div>
+      </main>
+    </div>
   );
 }
