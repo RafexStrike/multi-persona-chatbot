@@ -1,6 +1,8 @@
 "use client";
 
 import { useRef, useEffect, useState, useCallback } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { getPersonaName, type Persona } from "@/lib/personas";
 import {
   SidebarProvider,
@@ -388,7 +390,62 @@ export default function ChatPage() {
                     }`}
                     style={{ animation: "slideIn 0.3s ease-out" }}
                   >
-                    {msg.content}
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        p: ({ children, ...props }: any) => (
+                          <p className="mt-0 mb-3 leading-7" {...props}>
+                            {children}
+                          </p>
+                        ),
+                        code: ({ inline, className, children, ...props }: any) =>
+                          inline ? (
+                            <code
+                              className="rounded bg-[#1E1824] px-1 py-[0.15rem] text-sm text-[#E0C9A8]"
+                              {...props}
+                            >
+                              {children}
+                            </code>
+                          ) : (
+                            <pre className="overflow-x-auto rounded-lg bg-[#1B1721] p-4 text-sm text-[#E0C9A8]">
+                              <code className={className} {...props}>
+                                {children}
+                              </code>
+                            </pre>
+                          ),
+                        blockquote: ({ children, ...props }: any) => (
+                          <blockquote
+                            className="border-l-4 border-[#3B2134] pl-4 italic text-[#D3C2AB]/80"
+                            {...props}
+                          >
+                            {children}
+                          </blockquote>
+                        ),
+                        ul: ({ children, ...props }: any) => (
+                          <ul className="ml-4 mt-2 space-y-1 list-disc" {...props}>
+                            {children}
+                          </ul>
+                        ),
+                        ol: ({ children, ...props }: any) => (
+                          <ol className="ml-4 mt-2 space-y-1 list-decimal" {...props}>
+                            {children}
+                          </ol>
+                        ),
+                        a: ({ href, children, ...props }: any) => (
+                          <a
+                            href={href}
+                            className="text-[#8EB8FF] underline"
+                            target="_blank"
+                            rel="noreferrer"
+                            {...props}
+                          >
+                            {children}
+                          </a>
+                        ),
+                      }}
+                    >
+                      {msg.content}
+                    </ReactMarkdown>
                   </div>
                 </div>
               ))}
