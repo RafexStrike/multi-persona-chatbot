@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState } from "react";
+import { getPersonaName, type Persona } from "@/lib/personas";
 
 interface Message {
   id: string;
@@ -13,6 +14,7 @@ export default function ChatPage() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [persona, setPersona] = useState<Persona>("piyush");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -50,7 +52,7 @@ export default function ChatPage() {
     // Show loading state
     setIsLoading(true);
 
-    console.info("[chat page] sending message", { message: input.trim() });
+    console.info("[chat page] sending message", { message: input.trim(), persona });
 
     try {
       const response = await fetch("/api/chat", {
@@ -58,7 +60,11 @@ export default function ChatPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ message: input.trim() }),
+        body: JSON.stringify({
+          message: input.trim(),
+          persona: persona,
+          history: messages,
+        }),
       });
 
       if (!response.ok) {
@@ -93,11 +99,39 @@ export default function ChatPage() {
     }
   };
 
+  const handlePersonaChange = (newPersona: Persona) => {
+    // Only reset if persona is actually changing
+    if (newPersona !== persona) {
+      setPersona(newPersona);
+      setMessages([]);
+      setError(null);
+      setInput("");
+    }
+  };
+
   return (
     <div className="chat-container">
       {/* Header */}
       <div className="chat-header">
         <h1>💬 AI Coding Teacher</h1>
+        
+        {/* Persona Toggle */}
+        <div className="persona-selector">
+          <button
+            className={`persona-button ${persona === "piyush" ? "active" : ""}`}
+            onClick={() => handlePersonaChange("piyush")}
+            disabled={isLoading}
+          >
+            {getPersonaName("piyush")}
+          </button>
+          <button
+            className={`persona-button ${persona === "hitesh" ? "active" : ""}`}
+            onClick={() => handlePersonaChange("hitesh")}
+            disabled={isLoading}
+          >
+            {getPersonaName("hitesh")}
+          </button>
+        </div>
       </div>
 
       {/* Messages Area */}
