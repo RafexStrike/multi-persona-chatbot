@@ -2,6 +2,10 @@
 
 A simple AI chat app built with Next.js and Hugging Face.
 
+## Live Link
+
+ [https://genai-assignment1.vercel.app](https://genai-assignment1.vercel.app/)
+ 
 ## Setup
 
 1. Install dependencies:

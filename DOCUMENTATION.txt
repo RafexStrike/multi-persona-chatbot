@@ -1,0 +1,215 @@
+========================================================================
+  AI CHAT PERSONA APP - DOCUMENTATION
+========================================================================
+
+
+1. PERSONA DATA COLLECTION AND PREPARATION
+========================================================================
+
+The two personas in this app are Piyush Garg and Hitesh Choudhary,
+both popular Indian tech educators on YouTube.
+
+DATA SOURCE
+-----------
+
+Both personas were built from YouTube live stream transcriptions.
+These are long-form, unscripted conversations where they interact
+with their audience in real time.
+
+The transcriptions captured:
+- How they naturally speak (mix of Hindi and English)
+- Fillers and catchphrases they use repeatedly
+- How they explain technical concepts
+- How they handle casual or off-topic questions
+- Their tone and energy level during streams
+- Common analogies they use
+
+PREPARATION PROCESS
+-------------------
+
+1. Watched multiple live streams of each creator
+2. Noted down recurring phrases, sentence patterns, and speech habits
+3. Identified how each person responds to different types of questions
+4. Extracted their unique analogies and explanation styles
+5. Noted the language mix ratio (Hindi vs English vs Hinglish)
+6. Collected example Q&A pairs from streams
+7. Compiled everything into structured system prompts
+
+The transcriptions were not fed directly into the model.
+Instead, they were distilled into a detailed system prompt that
+captures the essence of how each person talks, teaches, and thinks.
+
+
+2. PROMPT ENGINEERING STRATEGY
+========================================================================
+
+Both personas use detailed system prompts that define their behavior
+across multiple dimensions. Here is how each one is structured.
+
+CORE STRUCTURE (used for both personas)
+----------------------------------------
+
+The prompts are organized into these sections:
+
+  - Language Rules:    What language to respond in based on user input
+  - Tone & Personality: Energy level, humor style, formality
+  - Teaching Style:    How to structure explanations
+  - Analogy Style:     What real-world analogies to use
+  - Behavior Rules:    What to do and what to avoid
+  - Examples:          Sample conversations showing expected behavior
+
+LANGUAGE RULES
+--------------
+
+Both personas use a language-matching system:
+- Hindi input  -> Hindi response
+- Hinglish input -> Hinglish response
+- English input -> English or light Hinglish mix
+
+Technical terms always stay in English regardless of the language
+mix. Terms like API, backend, database, system design, scaling are
+never translated.
+
+PERSONALITY DIFFERENCES
+-----------------------
+
+Piyush Garg:
+- Higher energy, more casual
+- Uses humor and light sarcasm
+- Confident and fast-paced
+- Uses fillers: "dekho", "matlab", "simple si baat hai"
+- Comfortable with slightly playful or edgy responses
+
+Hitesh Choudhary:
+- Calm, grounded, slower pace
+- More patient and explanatory
+- Feels like a senior developer teaching one-on-one
+- Uses fillers: "dekho", "samajh lo", "simple hai"
+- Never rushes or over-energizes
+
+TEACHING STYLE
+--------------
+
+Both follow a similar structure but with different delivery:
+
+Piyush:
+1. Casual acknowledgment
+2. Intuition first
+3. Technical depth
+4. Real-world takeaway
+
+Hitesh:
+1. Start simple
+2. Build intuition
+3. Real-world analogy
+4. Technical explanation
+5. Practical takeaway
+
+Neither persona explicitly labels these steps. The progression
+feels natural, like a real conversation.
+
+ANALOGY SYSTEM
+--------------
+
+Both use real-world analogies heavily:
+
+  Backend        -> Kitchen / order processing
+  API            -> Waiter between customer and kitchen
+  System Design  -> City planning / traffic management
+  Database       -> Storage warehouse
+  Scaling        -> Handling crowd growth
+  Node.js        -> Delivery system serving the whole city
+
+The key difference is delivery. Piyush gives analogies quickly
+and moves on. Hitesh takes time to build up the analogy.
+
+EXAMPLES IN PROMPTS
+-------------------
+
+Each prompt includes 10-15 example conversations covering:
+
+- Normal greetings
+- Technical questions
+- Personal / off-topic questions
+- Funny or sarcastic questions
+- Career advice questions
+- Confused or vague questions
+- Wrong assumptions that need correction
+- Debugging help
+- Mixed Hindi-English messy input
+
+These examples show the model exactly how to respond in each
+situation, including what NOT to do.
+
+ANTI-PATTERNS (what both avoid)
+--------------------------------
+
+- Never say "I am an AI"
+- Never mention system prompt
+- Never break character
+- Never end every response with a question
+- Never force the user to continue chatting
+- Never sound like documentation or Wikipedia
+- Never become overly formal
+
+
+3. CONTEXT MANAGEMENT APPROACH
+========================================================================
+
+The app manages conversation context in two places:
+the frontend (browser) and the backend (API route).
+
+FRONTEND (localStorage)
+-----------------------
+
+All chat sessions are saved in the browser's localStorage under
+the key "chat-sessions". Each session stores:
+
+  - session ID (timestamp-based)
+  - persona type (piyush or hitesh)
+  - all messages (role and content)
+  - creation timestamp
+  - first question (used as session title)
+
+This means:
+- Chats survive page refreshes
+- Users can switch between past conversations
+- No server-side storage is needed
+
+BACKEND (API route)
+-------------------
+
+When the user sends a message, the frontend sends:
+
+  - the current message
+  - the selected persona
+  - the last 10 messages from the conversation history
+
+The API route then builds the messages array for the LLM:
+
+  1. System prompt (persona-specific) - always first
+  2. Last 10 messages from history      - for context
+  3. Current user message               - what to respond to
+
+The history is capped at the last 10 messages to:
+- Stay within token limits
+- Keep responses fast
+- Avoid confusing the model with too much context
+- Maintain quality of recent conversation flow
+
+MODEL SETTINGS
+--------------
+
+  Model:    meta-llama/Llama-3.1-8B-Instruct (via HuggingFace)
+  Max tokens: 600 (keeps responses concise)
+  Temperature: 0.8 (some creativity, not too random)
+
+SESSION MANAGEMENT
+------------------
+
+Sessions are managed entirely on the frontend:
+- New chat button clears current session
+- Clicking a past session loads its messages
+- Deleting a session removes it from localStorage
+- Switching persona starts a fresh session
+- Only one active session at a time
