@@ -5,7 +5,6 @@ import { getPersonaName, type Persona } from "@/lib/personas";
 import {
   SidebarProvider,
   Sidebar,
-  SidebarHeader,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
@@ -17,6 +16,7 @@ import {
   SidebarSeparator,
   SidebarTrigger,
   SidebarInset,
+  useSidebar,
 } from "@/components/ui/sidebar";
 
 interface Message {
@@ -48,6 +48,35 @@ function loadSessions(): ChatSession[] {
 function saveSessions(sessions: ChatSession[]) {
   if (typeof window === "undefined") return;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
+}
+
+function NewChatButton({ onClick, disabled }: { onClick: () => void; disabled?: boolean }) {
+  const { open } = useSidebar();
+
+  if (!open) {
+    return (
+      <button
+        onClick={onClick}
+        disabled={disabled}
+        className="w-full flex items-center justify-center bg-[#43162C] hover:bg-[#3B2134] text-[#D3C2AB] p-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        title="New chat"
+      >
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M9 3v12M3 9h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+        </svg>
+      </button>
+    );
+  }
+
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className="w-full bg-[#43162C] hover:bg-[#3B2134] text-[#D3C2AB] p-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      + New chat
+    </button>
+  );
 }
 
 export default function ChatPage() {
@@ -214,18 +243,18 @@ export default function ChatPage() {
   return (
     <SidebarProvider open={sidebarOpen} onOpenChange={setSidebarOpen}>
       <div className="flex h-screen bg-[#221D27]">
-        <Sidebar collapsible="offcanvas">
-          <SidebarHeader className="border-b border-[#28242E] pb-4">
-            <button
-              onClick={handleNewChat}
-              disabled={isLoading}
-              className="w-full bg-[#43162C] hover:bg-[#3B2134] text-[#D3C2AB] p-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              + New chat
-            </button>
-          </SidebarHeader>
-
+        <Sidebar>
           <SidebarContent>
+            <SidebarGroup>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <NewChatButton onClick={handleNewChat} disabled={isLoading} />
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+
             <SidebarGroup>
               <SidebarGroupLabel>Personas</SidebarGroupLabel>
               <SidebarGroupContent>
@@ -235,6 +264,12 @@ export default function ChatPage() {
                       isActive={persona === "piyush" && !activeSessionId}
                       onClick={() => handlePersonaChange("piyush")}
                       disabled={isLoading}
+                      icon={
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                          <circle cx="8" cy="5" r="3" stroke="currentColor" strokeWidth="1.5"/>
+                          <path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                        </svg>
+                      }
                     >
                       {getPersonaName("piyush")}
                     </SidebarMenuButton>
@@ -244,6 +279,12 @@ export default function ChatPage() {
                       isActive={persona === "hitesh" && !activeSessionId}
                       onClick={() => handlePersonaChange("hitesh")}
                       disabled={isLoading}
+                      icon={
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                          <circle cx="8" cy="5" r="3" stroke="currentColor" strokeWidth="1.5"/>
+                          <path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                        </svg>
+                      }
                     >
                       {getPersonaName("hitesh")}
                     </SidebarMenuButton>
@@ -260,25 +301,24 @@ export default function ChatPage() {
                 <SidebarGroupContent>
                   <SidebarMenu>
                     {sessions.map((session) => (
-                      <SidebarMenuItem key={session.id}>
+                      <SidebarMenuItem key={session.id} className="group">
                         <SidebarMenuButton
                           isActive={activeSessionId === session.id}
                           onClick={() => handleLoadSession(session)}
-                          className="group flex items-center justify-between w-full"
+                          icon={
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                              <path d="M2 3h12v8H4l-2 2V3z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          }
                         >
-                          <span className="truncate">
-                            {session.firstQuestion}
-                          </span>
-                          <span className="text-[10px] text-[#D3C2AB]/40 ml-2">
-                            {getPersonaName(session.persona).split(" ")[0]}
-                          </span>
-                          <button
-                            onClick={(e) => handleDeleteSession(session.id, e)}
-                            className="ml-1 opacity-0 group-hover:opacity-100 text-[#D3C2AB]/40 hover:text-[#D3C2AB] transition-opacity text-xs"
-                          >
-                            ×
-                          </button>
+                          {session.firstQuestion}
                         </SidebarMenuButton>
+                        <button
+                          onClick={(e) => handleDeleteSession(session.id, e)}
+                          className="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 text-[#D3C2AB]/40 hover:text-[#D3C2AB] transition-opacity text-xs p-1"
+                        >
+                          ×
+                        </button>
                       </SidebarMenuItem>
                     ))}
                   </SidebarMenu>
@@ -287,13 +327,26 @@ export default function ChatPage() {
             )}
           </SidebarContent>
 
-          <SidebarFooter className="text-xs text-[#D3C2AB]/40">
-            AI Chat v1.0
+          <SidebarFooter>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  icon={
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                      <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.5"/>
+                      <path d="M8 5v3l2 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                    </svg>
+                  }
+                >
+                  <span className="text-[#D3C2AB]/40">AI Chat v1.0</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
           </SidebarFooter>
         </Sidebar>
 
-        <SidebarInset className="flex-1 flex flex-col min-w-0">
-          <div className="h-16 border-b border-[#28242E] bg-[#140E12] flex items-center justify-between px-6">
+        <SidebarInset>
+          <div className="h-16 border-b border-[#28242E] bg-[#140E12] flex items-center justify-between px-6 shrink-0">
             <div className="flex items-center gap-3">
               <SidebarTrigger />
               <h1 className="text-xl font-semibold text-[#D3C2AB]">Persona</h1>
@@ -365,7 +418,7 @@ export default function ChatPage() {
             <div ref={messagesEndRef} />
           </div>
 
-          <div className="border-t border-[#28242E] bg-[#140E12] p-4">
+          <div className="border-t border-[#28242E] bg-[#140E12] p-4 shrink-0">
             <div className="flex gap-3">
               <textarea
                 ref={inputRef}
