@@ -117,7 +117,13 @@ export default function ChatPage() {
 
       const firstUserMsg = msgs.find((m) => m.role === "user");
       const firstQuestion = firstUserMsg
-        ? firstUserMsg.content.slice(0, 4)
+        ? firstUserMsg.content
+            .replace(/\s+/g, " ")
+            .trim()
+            .split(" ")
+            .filter(Boolean)
+            .slice(0, 3)
+            .join(" ")
         : "Chat";
 
       setSessions((prev) => {
