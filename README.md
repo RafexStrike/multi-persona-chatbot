@@ -1,4 +1,4 @@
-# AI Chat App
+# A Simple AI Chat Application that tries to mimic Hitesh Choudhury and Piyush Garg
 
 A simple AI chat app built with Next.js and Hugging Face.
 
