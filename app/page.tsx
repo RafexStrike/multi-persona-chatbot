@@ -111,31 +111,52 @@ export default function ChatPage() {
 
   return (
     <div className="chat-container">
-      {/* Header */}
-      <div className="chat-header">
-        <h1>💬 AI Coding Teacher</h1>
-        
-        {/* Persona Toggle */}
-        <div className="persona-selector">
+      <aside className="sidebar">
+        <div className="sidebar-top">
           <button
-            className={`persona-button ${persona === "piyush" ? "active" : ""}`}
-            onClick={() => handlePersonaChange("piyush")}
+            className="new-chat"
+            onClick={() => {
+              setMessages([]);
+              setError(null);
+              setInput("");
+            }}
             disabled={isLoading}
           >
-            {getPersonaName("piyush")}
-          </button>
-          <button
-            className={`persona-button ${persona === "hitesh" ? "active" : ""}`}
-            onClick={() => handlePersonaChange("hitesh")}
-            disabled={isLoading}
-          >
-            {getPersonaName("hitesh")}
+            + New chat
           </button>
         </div>
-      </div>
 
-      {/* Messages Area */}
-      <div className="chat-messages">
+        <div className="sidebar-section">
+          <h4>Personas</h4>
+          <div className="persona-list">
+            <button
+              className={`persona-item ${persona === "piyush" ? "active" : ""}`}
+              onClick={() => handlePersonaChange("piyush")}
+              disabled={isLoading}
+            >
+              {getPersonaName("piyush")}
+            </button>
+            <button
+              className={`persona-item ${persona === "hitesh" ? "active" : ""}`}
+              onClick={() => handlePersonaChange("hitesh")}
+              disabled={isLoading}
+            >
+              {getPersonaName("hitesh")}
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <main className="chat-main">
+        <div className="chat-header">
+          <h1>Persona</h1>
+          <div className="header-actions">
+            <div className="persona-chip">{getPersonaName(persona)}</div>
+          </div>
+        </div>
+
+        {/* Messages Area */}
+        <div className="chat-messages">
         {messages.length === 0 && !isLoading && (
           <div className="empty-state">
             <div>
@@ -172,10 +193,10 @@ export default function ChatPage() {
         )}
 
         <div ref={messagesEndRef} />
-      </div>
+        </div>
 
-      {/* Input Area */}
-      <div className="chat-input-area">
+        {/* Input Area */}
+        <div className="chat-input-area">
         <textarea
           ref={inputRef}
           value={input}
@@ -193,7 +214,9 @@ export default function ChatPage() {
         >
           {isLoading ? "..." : "Send"}
         </button>
+        </div>
+
+        </main>
       </div>
-    </div>
   );
 }

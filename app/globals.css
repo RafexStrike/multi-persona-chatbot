@@ -4,6 +4,11 @@
   box-sizing: border-box;
 }
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
 html,
 body {
   height: 100%;
@@ -19,22 +24,82 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.app-shell {
+  display: flex;
+  height: 100vh;
+  gap: 20px;
+  align-items: stretch;
+  justify-content: center;
+  padding: 28px;
+}
+
 .chat-container {
   display: flex;
-  flex-direction: column;
-  height: 100vh;
-  max-width: 900px;
+  height: 100%;
+  width: 100%;
+  max-width: 1100px;
   margin: 0 auto;
   background: white;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 220px;
+  background: #0b1220;
+  color: #cfe3ff;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sidebar .new-chat {
+  background: linear-gradient(180deg, #10a37f, #0e8f6a);
+  color: white;
+  border: none;
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.sidebar-section h4 {
+  font-size: 0.9rem;
+  color: #9fbce8;
+  margin-bottom: 6px;
+}
+
+.persona-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.persona-item {
+  background: transparent;
+  color: #dbefff;
+  border: 1px solid rgba(255,255,255,0.04);
+  padding: 8px 10px;
+  border-radius: 6px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.persona-item.active {
+  background: rgba(255,255,255,0.06);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
 }
 
 .chat-header {
-  padding: 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  text-align: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 16px 20px;
+  background: linear-gradient(180deg, #ffffff, #fbfbfd);
+  color: #111;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #eee;
 }
 
 .chat-header h1 {
@@ -135,7 +200,7 @@ body {
 }
 
 .chat-input-area {
-  padding: 20px;
+  padding: 16px;
   border-top: 1px solid #eee;
   background: #fafafa;
   display: flex;
@@ -161,15 +226,15 @@ body {
 }
 
 .send-button {
-  padding: 12px 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  padding: 10px 18px;
+  background: linear-gradient(180deg, #0f1724, #0b1220);
+  color: #dbefff;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
-  transition: all 0.2s;
-  min-width: 80px;
+  transition: all 0.18s;
+  min-width: 72px;
 }
 
 .send-button:hover:not(:disabled) {
@@ -202,23 +267,11 @@ body {
 
 /* Persona Selector Styles */
 .persona-selector {
-  display: flex;
-  gap: 12px;
-  margin-top: 16px;
-  justify-content: center;
-  flex-wrap: wrap;
+  display: none;
 }
 
 .persona-button {
-  padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 0.9rem;
-  transition: all 0.2s;
+  display: none;
 }
 
 .persona-button:hover:not(:disabled) {
@@ -227,13 +280,32 @@ body {
 }
 
 .persona-button.active {
-  background: rgba(255, 255, 255, 0.9);
-  color: #667eea;
-  border-color: rgba(255, 255, 255, 1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  display: none;
 }
 
 .persona-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* Main column where chat lives */
+.chat-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.persona-chip {
+  background: #eef6ff;
+  color: #0b1220;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 600;
 }
